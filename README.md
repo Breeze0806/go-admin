@@ -161,7 +161,7 @@ vi ./config/settings.yml
 :::tip ⚠️Note that this problem will occur if CGO is not installed in the windows10+ environment;
 
 ```bash
-E:\go-admin>go build
+E:\go-admin>go build -tags sqlite3
 # github.com/mattn/go-sqlite3
 cgo: exec /missing-cc: exec: "/missing-cc": file does not exist
 ```
@@ -193,7 +193,7 @@ $ go-admin.exe migrate -c config/settings.dev.yml
 $ ./go-admin server -c config/settings.yml
 
 # ⚠️Note: Use under windows
-$ go-admin.exe server -c config/settings.yml
+$ go-admin.exe server -c config/settings.demo.yml
 ```
 
 #### Use docker to compile and start

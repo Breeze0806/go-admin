@@ -149,7 +149,7 @@ cd ./go-admin
 go mod tidy
 
 # 编译项目
-go build
+go build go build -tags sqlite3
 
 # 修改配置 
 # 文件路径  go-admin/config/settings.yml
@@ -163,7 +163,7 @@ vi ./config/settings.yml
 :::tip ⚠️注意 在windows环境如果没有安装中CGO，会出现这个问题；
 
 ```bash
-E:\go-admin>go build
+E:\go-admin>go build 
 # github.com/mattn/go-sqlite3
 cgo: exec /missing-cc: exec: "/missing-cc": file does not exist
 ```
@@ -197,7 +197,7 @@ $ ./go-admin server -c config/settings.yml
 
 
 # ⚠️注意:windows 下使用
-$ go-admin.exe server -c config/settings.yml
+$ go-admin.exe server -c config/settings.demo.yml
 ```
 
 #### sys_api 表的数据如何添加
