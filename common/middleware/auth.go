@@ -3,8 +3,8 @@ package middleware
 import (
 	"time"
 
-	"github.com/go-admin-team/go-admin-core/sdk/config"
-	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
+	"github.com/Breeze0806/go-admin-core/sdk/config"
+	jwt "github.com/Breeze0806/go-admin-core/sdk/pkg/jwtauth"
 	"go-admin/common/middleware/handler"
 )
 

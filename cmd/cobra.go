@@ -7,7 +7,7 @@ import (
 	"go-admin/common/global"
 	"os"
 
-	"github.com/go-admin-team/go-admin-core/sdk/pkg"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg"
 
 	"github.com/spf13/cobra"
 

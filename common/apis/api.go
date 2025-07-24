@@ -6,10 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/go-admin-team/go-admin-core/logger"
-	"github.com/go-admin-team/go-admin-core/sdk/api"
-	"github.com/go-admin-team/go-admin-core/sdk/pkg"
-	"github.com/go-admin-team/go-admin-core/sdk/pkg/response"
+	"github.com/Breeze0806/go-admin-core/logger"
+	"github.com/Breeze0806/go-admin-core/sdk/api"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg/response"
 	"gorm.io/gorm"
 
 	"go-admin/common/service"

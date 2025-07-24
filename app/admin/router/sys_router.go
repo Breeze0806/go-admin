@@ -4,11 +4,11 @@ import (
 	"go-admin/app/admin/apis"
 	"mime"
 
-	"github.com/go-admin-team/go-admin-core/sdk/config"
+	"github.com/Breeze0806/go-admin-core/sdk/config"
 
 	"github.com/gin-gonic/gin"
-	jwt "github.com/go-admin-team/go-admin-core/sdk/pkg/jwtauth"
-	"github.com/go-admin-team/go-admin-core/sdk/pkg/ws"
+	jwt "github.com/Breeze0806/go-admin-core/sdk/pkg/jwtauth"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg/ws"
 
 	"go-admin/common/middleware"
 	"go-admin/common/middleware/handler"

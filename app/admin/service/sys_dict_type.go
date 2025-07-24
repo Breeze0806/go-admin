@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/go-admin-team/go-admin-core/sdk/service"
+	"github.com/Breeze0806/go-admin-core/sdk/service"
 	"gorm.io/gorm"
 
 	"go-admin/app/admin/models"

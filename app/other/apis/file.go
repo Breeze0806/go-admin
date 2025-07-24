@@ -8,12 +8,10 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-admin-team/go-admin-core/sdk/api"
-	"github.com/go-admin-team/go-admin-core/sdk/pkg"
-	"github.com/go-admin-team/go-admin-core/sdk/pkg/utils"
+	"github.com/Breeze0806/go-admin-core/sdk/api"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg/utils"
 	"github.com/google/uuid"
-
-	"go-admin/common/file_store"
 )
 
 type FileResponse struct {
@@ -96,11 +94,6 @@ func (e File) baseImg(c *gin.Context, fileResponse FileResponse, urlPerfix strin
 		Type:     typeStr,
 	}
 	source, _ := c.GetPostForm("source")
-	err = thirdUpload(source, fileName, base64File)
-	if err != nil {
-		e.Error(200, errors.New(""), "上传第三方失败")
-		return fileResponse
-	}
 	if source != "1" {
 		fileResponse.Path = "/static/uploadfile/" + fileName
 		fileResponse.FullPath = "/static/uploadfile/" + fileName
@@ -124,23 +117,18 @@ func (e File) multipleFile(c *gin.Context, urlPerfix string) []FileResponse {
 		err1 := c.SaveUploadedFile(f, multipartFileName)
 		fileType, _ := utils.GetType(multipartFileName)
 		if err1 == nil {
-			err := thirdUpload(source, fileName, multipartFileName)
-			if err != nil {
-				e.Error(500, errors.New(""), "上传第三方失败")
-			} else {
-				fileResponse := FileResponse{
-					Size:     pkg.GetFileSize(multipartFileName),
-					Path:     multipartFileName,
-					FullPath: urlPerfix + multipartFileName,
-					Name:     f.Filename,
-					Type:     fileType,
-				}
-				if source != "1" {
-					fileResponse.Path = "/static/uploadfile/" + fileName
-					fileResponse.FullPath = "/static/uploadfile/" + fileName
-				}
-				multipartFile = append(multipartFile, fileResponse)
+			fileResponse := FileResponse{
+				Size:     pkg.GetFileSize(multipartFileName),
+				Path:     multipartFileName,
+				FullPath: urlPerfix + multipartFileName,
+				Name:     f.Filename,
+				Type:     fileType,
 			}
+			if source != "1" {
+				fileResponse.Path = "/static/uploadfile/" + fileName
+				fileResponse.FullPath = "/static/uploadfile/" + fileName
+			}
+			multipartFile = append(multipartFile, fileResponse)
 		}
 	}
 	return multipartFile
@@ -172,33 +160,7 @@ func (e File) singleFile(c *gin.Context, fileResponse FileResponse, urlPerfix st
 		Name:     files.Filename,
 		Type:     fileType,
 	}
-	//source, _ := c.GetPostForm("source")
-	//err = thirdUpload(source, fileName, singleFile)
-	//if err != nil {
-	//	e.Error(200, errors.New(""), "上传第三方失败")
-	//	return FileResponse{}, true
-	//}
 	fileResponse.Path = "/static/uploadfile/" + fileName
 	fileResponse.FullPath = "/static/uploadfile/" + fileName
 	return fileResponse, false
-}
-
-func thirdUpload(source string, name string, path string) error {
-	switch source {
-	case "2":
-		return ossUpload("img/"+name, path)
-	case "3":
-		return qiniuUpload("img/"+name, path)
-	}
-	return nil
-}
-
-func ossUpload(name string, path string) error {
-	oss := file_store.ALiYunOSS{}
-	return oss.UpLoad(name, path)
-}
-
-func qiniuUpload(name string, path string) error {
-	oss := file_store.ALiYunOSS{}
-	return oss.UpLoad(name, path)
 }

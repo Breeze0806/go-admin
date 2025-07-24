@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
-	"github.com/go-admin-team/go-admin-core/sdk/runtime"
+	"github.com/Breeze0806/go-admin-core/sdk/runtime"
 	"log"
 	"net/http"
 	"os"
@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-admin-team/go-admin-core/config/source/file"
-	"github.com/go-admin-team/go-admin-core/sdk"
-	"github.com/go-admin-team/go-admin-core/sdk/api"
-	"github.com/go-admin-team/go-admin-core/sdk/config"
-	"github.com/go-admin-team/go-admin-core/sdk/pkg"
+	"github.com/Breeze0806/go-admin-core/config/source/file"
+	"github.com/Breeze0806/go-admin-core/sdk"
+	"github.com/Breeze0806/go-admin-core/sdk/api"
+	"github.com/Breeze0806/go-admin-core/sdk/config"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg"
 	"github.com/spf13/cobra"
 
 	"go-admin/app/admin/models"
@@ -177,8 +177,7 @@ func initRouter() {
 		r.Use(handler.TlsHandler())
 	}
 	//r.Use(middleware.Metrics())
-	r.Use(common.Sentinel()).
-		Use(common.RequestId(pkg.TrafficKey)).
+	r.Use(common.RequestId(pkg.TrafficKey)).
 		Use(api.SetRequestLogger)
 
 	common.InitMiddleware(r)

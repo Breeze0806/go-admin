@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-admin-team/go-admin-core/sdk/api"
-	"github.com/go-admin-team/go-admin-core/sdk/pkg"
-	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/response"
+	"github.com/Breeze0806/go-admin-core/sdk/api"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg"
+	_ "github.com/Breeze0806/go-admin-core/sdk/pkg/response"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"

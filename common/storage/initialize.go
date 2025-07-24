@@ -10,9 +10,9 @@ package storage
 import (
 	"log"
 
-	"github.com/go-admin-team/go-admin-core/sdk"
-	"github.com/go-admin-team/go-admin-core/sdk/config"
-	"github.com/go-admin-team/go-admin-core/sdk/pkg/captcha"
+	"github.com/Breeze0806/go-admin-core/sdk"
+	"github.com/Breeze0806/go-admin-core/sdk/config"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg/captcha"
 )
 
 // Setup 配置storage组件
@@ -39,14 +39,5 @@ func Setup() {
 		defer func() {
 			go queueAdapter.Run()
 		}()
-	}
-
-	//7. 设置分布式锁
-	if !config.LockerConfig.Empty() {
-		lockerAdapter, err := config.LockerConfig.Setup()
-		if err != nil {
-			log.Fatalf("locker setup error, %s\n", err.Error())
-		}
-		sdk.Runtime.SetLockerAdapter(lockerAdapter)
 	}
 }

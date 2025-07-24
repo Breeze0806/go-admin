@@ -2,8 +2,8 @@ package tools
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/go-admin-team/go-admin-core/sdk/pkg"
-	_ "github.com/go-admin-team/go-admin-core/sdk/pkg/response"
+	"github.com/Breeze0806/go-admin-core/sdk/pkg"
+	_ "github.com/Breeze0806/go-admin-core/sdk/pkg/response"
 
 	"go-admin/app/other/models/tools"
 )
