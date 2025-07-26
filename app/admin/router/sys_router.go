@@ -6,9 +6,9 @@ import (
 
 	"github.com/Breeze0806/go-admin-core/sdk/config"
 
-	"github.com/gin-gonic/gin"
 	jwt "github.com/Breeze0806/go-admin-core/sdk/pkg/jwtauth"
 	"github.com/Breeze0806/go-admin-core/sdk/pkg/ws"
+	"github.com/gin-gonic/gin"
 
 	"go-admin/common/middleware"
 	"go-admin/common/middleware/handler"
@@ -42,9 +42,6 @@ func sysStaticFileRouter(r *gin.RouterGroup) {
 		return
 	}
 	r.Static("/static", "./static")
-	if config.ApplicationConfig.Mode != "prod" {
-		r.Static("/form-generator", "./static/form-generator")
-	}
 }
 
 func sysCheckRoleRouterInit(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {

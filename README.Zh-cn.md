@@ -197,7 +197,7 @@ $ ./go-admin server -c config/settings.yml
 
 
 # ⚠️注意:windows 下使用
-$ go-admin.exe server -c config/settings.demo.yml
+$ go-admin.exe server -c config/settings.sqlite.yml
 ```
 
 #### sys_api 表的数据如何添加

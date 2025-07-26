@@ -3,17 +3,15 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"go-admin/cmd/app"
-	"go-admin/common/global"
 	"os"
 
 	"github.com/Breeze0806/go-admin-core/sdk/pkg"
-
 	"github.com/spf13/cobra"
 
 	"go-admin/cmd/api"
-	"go-admin/cmd/config"
+	"go-admin/cmd/app"
 	"go-admin/cmd/version"
+	"go-admin/common/global"
 )
 
 var rootCmd = &cobra.Command{
@@ -44,7 +42,6 @@ func tip() {
 func init() {
 	rootCmd.AddCommand(api.StartCmd)
 	rootCmd.AddCommand(version.StartCmd)
-	rootCmd.AddCommand(config.StartCmd)
 	rootCmd.AddCommand(app.StartCmd)
 }
 

@@ -3,19 +3,18 @@ package api
 import (
 	"context"
 	"fmt"
-	"github.com/Breeze0806/go-admin-core/sdk/runtime"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/Breeze0806/go-admin-core/config/source/file"
 	"github.com/Breeze0806/go-admin-core/sdk"
 	"github.com/Breeze0806/go-admin-core/sdk/api"
 	"github.com/Breeze0806/go-admin-core/sdk/config"
 	"github.com/Breeze0806/go-admin-core/sdk/pkg"
+	"github.com/Breeze0806/go-admin-core/sdk/runtime"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 
 	"go-admin/app/admin/models"
@@ -60,11 +59,14 @@ func setup() {
 	// 注入配置扩展项
 	config.ExtendConfig = &ext.ExtConfig
 	//1. 读取配置
+	fmt.Println("read config")
 	config.Setup(
-		file.NewSource(file.WithPath(configYml)),
+		configYml,
 		database.Setup,
 		storage.Setup,
 	)
+	fmt.Println("register funcs")
+
 	//注册监听函数
 	queue := sdk.Runtime.GetMemoryQueue("")
 	queue.Register(global.LoginLog, models.SaveLoginLog)
@@ -131,9 +133,6 @@ func run() error {
 	fmt.Println(pkg.Green("Server run at:"))
 	fmt.Printf("-  Local:   %s://localhost:%d/ \r\n", "http", config.ApplicationConfig.Port)
 	fmt.Printf("-  Network: %s://%s:%d/ \r\n", pkg.GetLocaHonst(), "http", config.ApplicationConfig.Port)
-	fmt.Println(pkg.Green("Swagger run at:"))
-	fmt.Printf("-  Local:   http://localhost:%d/swagger/admin/index.html \r\n", config.ApplicationConfig.Port)
-	fmt.Printf("-  Network: %s://%s:%d/swagger/admin/index.html \r\n", "http", pkg.GetLocaHonst(), config.ApplicationConfig.Port)
 	fmt.Printf("%s Enter Control + C Shutdown Server \r\n", pkg.GetCurrentTimeStr())
 	// 等待中断信号以优雅地关闭服务器（设置 5 秒的超时时间）
 	quit := make(chan os.Signal, 1)
@@ -173,6 +172,7 @@ func initRouter() {
 		log.Fatal("not support other engine")
 		//os.Exit(-1)
 	}
+
 	if config.SslConfig.Enable {
 		r.Use(handler.TlsHandler())
 	}
