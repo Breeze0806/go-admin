@@ -30,7 +30,6 @@ import (
 
 var (
 	configYml string
-	apiCheck  bool
 	StartCmd  = &cobra.Command{
 		Use:          "server",
 		Short:        "Start API server",
@@ -49,7 +48,6 @@ var AppRouters = make([]func(), 0)
 
 func init() {
 	StartCmd.PersistentFlags().StringVarP(&configYml, "config", "c", "config/settings.yml", "Start server with provided configuration file")
-	StartCmd.PersistentFlags().BoolVarP(&apiCheck, "api", "a", false, "Start server with check api data")
 
 	//注册路由 fixme 其他应用的路由，在本目录新建文件放在init方法
 	AppRouters = append(AppRouters, router.InitRouter)
@@ -71,7 +69,6 @@ func setup() {
 	queue := sdk.Runtime.GetMemoryQueue("")
 	queue.Register(global.LoginLog, models.SaveLoginLog)
 	queue.Register(global.OperateLog, models.SaveOperaLog)
-	queue.Register(global.ApiCheck, models.SaveSysApi)
 	go queue.Run()
 
 	usageStr := `starting api server...`
@@ -98,23 +95,6 @@ func run() error {
 		jobs.Setup(sdk.Runtime.GetDb())
 
 	}()
-
-	if apiCheck {
-		var routers = sdk.Runtime.GetRouter()
-		q := sdk.Runtime.GetMemoryQueue("")
-		mp := make(map[string]interface{}, 0)
-		mp["List"] = routers
-		message, err := sdk.Runtime.GetStreamMessage("", global.ApiCheck, mp)
-		if err != nil {
-			log.Printf("GetStreamMessage error, %s \n", err.Error())
-			//日志报错错误，不中断请求
-		} else {
-			err = q.Append(message)
-			if err != nil {
-				log.Printf("Append message error, %s \n", err.Error())
-			}
-		}
-	}
 
 	go func() {
 		// 服务连接

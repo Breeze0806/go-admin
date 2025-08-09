@@ -7,7 +7,6 @@ import (
 	"github.com/Breeze0806/go-admin-core/sdk/config"
 
 	jwt "github.com/Breeze0806/go-admin-core/sdk/pkg/jwtauth"
-	"github.com/Breeze0806/go-admin-core/sdk/pkg/ws"
 	"github.com/gin-gonic/gin"
 
 	"go-admin/common/middleware"
@@ -25,11 +24,6 @@ func InitSysRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gin.Rou
 }
 
 func sysBaseRouter(r *gin.RouterGroup) {
-
-	go ws.WebsocketManager.Start()
-	go ws.WebsocketManager.SendService()
-	go ws.WebsocketManager.SendAllService()
-
 	if config.ApplicationConfig.Mode != "prod" {
 		r.GET("/", apis.GoAdmin)
 	}
@@ -45,12 +39,6 @@ func sysStaticFileRouter(r *gin.RouterGroup) {
 }
 
 func sysCheckRoleRouterInit(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
-	wss := r.Group("").Use(authMiddleware.MiddlewareFunc())
-	{
-		wss.GET("/ws/:id/:channel", ws.WebsocketManager.WsClient)
-		wss.GET("/wslogout/:id/:channel", ws.WebsocketManager.UnWsClient)
-	}
-
 	v1 := r.Group("/api/v1")
 	{
 		v1.POST("/login", authMiddleware.LoginHandler)
@@ -61,13 +49,8 @@ func sysCheckRoleRouterInit(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddle
 }
 
 func registerBaseRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
-	api := apis.SysMenu{}
-	api2 := apis.SysDept{}
 	v1auth := v1.Group("").Use(authMiddleware.MiddlewareFunc()).Use(middleware.AuthCheckRole())
 	{
-		v1auth.GET("/roleMenuTreeselect/:roleId", api.GetMenuTreeSelect)
-		//v1.GET("/menuTreeselect", api.GetMenuTreeSelect)
-		v1auth.GET("/roleDeptTreeselect/:roleId", api2.GetDeptTreeRoleSelect)
 		v1auth.POST("/logout", handler.LogOut)
 	}
 }

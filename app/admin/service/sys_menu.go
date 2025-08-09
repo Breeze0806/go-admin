@@ -29,13 +29,17 @@ func (e *SysMenu) GetPage(c *dto.SysMenuGetPageReq, menus *[]models.SysMenu) *Sy
 		_ = e.AddError(err)
 		return e
 	}
+
 	for i := 0; i < len(menu); i++ {
 		if menu[i].ParentId != 0 {
 			continue
 		}
+
 		menusInfo := menuCall(&menu, menu[i])
 		*menus = append(*menus, menusInfo)
 	}
+
+	fmt.Printf("%+v\n", *menus)
 	return e
 }
 
@@ -48,8 +52,7 @@ func (e *SysMenu) getPage(c *dto.SysMenuGetPageReq, list *[]models.SysMenu) *Sys
 		Scopes(
 			cDto.OrderDest("sort", false),
 			cDto.MakeCondition(c.GetNeedSearch()),
-		).Preload("SysApi").
-		Find(list).Error
+		).Find(list).Error
 	if err != nil {
 		e.Log.Errorf("getSysMenuPage error:%s", err)
 		_ = e.AddError(err)
@@ -63,7 +66,7 @@ func (e *SysMenu) Get(d *dto.SysMenuGetReq, model *models.SysMenu) *SysMenu {
 	var err error
 	var data models.SysMenu
 
-	db := e.Orm.Model(&data).Preload("SysApi").
+	db := e.Orm.Model(&data).
 		First(model, d.GetId())
 	err = db.Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
@@ -77,11 +80,6 @@ func (e *SysMenu) Get(d *dto.SysMenuGetReq, model *models.SysMenu) *SysMenu {
 		_ = e.AddError(err)
 		return e
 	}
-	apis := make([]int, 0)
-	for _, v := range model.SysApi {
-		apis = append(apis, v.Id)
-	}
-	model.Apis = apis
 	return e
 }
 
@@ -98,12 +96,6 @@ func (e *SysMenu) Insert(c *dto.SysMenuInsertReq) *SysMenu {
 			tx.Commit()
 		}
 	}()
-	err = tx.Where("id in ?", c.Apis).Find(&data.SysApi).Error
-	if err != nil {
-		tx.Rollback()
-		e.Log.Errorf("db error:%s", err)
-		_ = e.AddError(err)
-	}
 	err = tx.Create(&data).Error
 	if err != nil {
 		tx.Rollback()
@@ -153,19 +145,10 @@ func (e *SysMenu) Update(c *dto.SysMenuUpdateReq) *SysMenu {
 			tx.Commit()
 		}
 	}()
-	var alist = make([]models.SysApi, 0)
 	var model = models.SysMenu{}
-	tx.Preload("SysApi").First(&model, c.GetId())
+	tx.First(&model, c.GetId())
 	oldPath := model.Paths
-	tx.Where("id in ?", c.Apis).Find(&alist)
-	err = tx.Model(&model).Association("SysApi").Delete(model.SysApi)
-	if err != nil {
-		e.Log.Errorf("delete policy error:%s", err)
-		_ = e.AddError(err)
-		return e
-	}
 	c.Generate(&model)
-	model.SysApi = alist
 	db := tx.Model(&model).Session(&gorm.Session{FullSaveAssociations: true}).Debug().Save(&model)
 	if err = db.Error; err != nil {
 		e.Log.Errorf("db error:%s", err)
@@ -240,39 +223,6 @@ func (e *SysMenu) SetLabel() (m []dto.MenuLabel, err error) {
 	return
 }
 
-// GetSysMenuByRoleName 左侧菜单
-func (e *SysMenu) GetSysMenuByRoleName(roleName ...string) ([]models.SysMenu, error) {
-	var MenuList []models.SysMenu
-	var role models.SysRole
-	var err error
-	admin := false
-	for _, s := range roleName {
-		if s == "admin" {
-			admin = true
-		}
-	}
-
-	if len(roleName) > 0 && admin {
-		var data []models.SysMenu
-		err = e.Orm.Where(" menu_type in ('M','C')").
-			Order("sort").
-			Find(&data).
-			Error
-		MenuList = data
-	} else {
-		err = e.Orm.Model(&role).Preload("SysMenu", func(db *gorm.DB) *gorm.DB {
-			return db.Where(" menu_type in ('M','C')").Order("sort")
-		}).Where("role_name in ?", roleName).Find(&role).
-			Error
-		MenuList = *role.SysMenu
-	}
-
-	if err != nil {
-		e.Log.Errorf("db error:%s", err)
-	}
-	return MenuList, err
-}
-
 // menuLabelCall 递归构造组织数据
 func menuLabelCall(eList *[]models.SysMenu, dept dto.MenuLabel) dto.MenuLabel {
 	list := *eList
@@ -328,7 +278,6 @@ func menuCall(menuList *[]models.SysMenu, menu models.SysMenu) models.SysMenu {
 		mi.Sort = list[j].Sort
 		mi.Visible = list[j].Visible
 		mi.CreatedAt = list[j].CreatedAt
-		mi.SysApi = list[j].SysApi
 		mi.Children = []models.SysMenu{}
 
 		if mi.MenuType != cModels.Button {
@@ -340,40 +289,6 @@ func menuCall(menuList *[]models.SysMenu, menu models.SysMenu) models.SysMenu {
 	}
 	menu.Children = min
 	return menu
-}
-
-func menuDistinct(menuList []models.SysMenu) (result []models.SysMenu) {
-	distinctMap := make(map[int]struct{}, len(menuList))
-	for _, menu := range menuList {
-		if _, ok := distinctMap[menu.MenuId]; !ok {
-			distinctMap[menu.MenuId] = struct{}{}
-			result = append(result, menu)
-		}
-	}
-	return result
-}
-
-func recursiveSetMenu(orm *gorm.DB, mIds []int, menus *[]models.SysMenu) error {
-	if len(mIds) == 0 || menus == nil {
-		return nil
-	}
-	var subMenus []models.SysMenu
-	err := orm.Where(fmt.Sprintf(" menu_type in ('%s', '%s', '%s') and menu_id in ?",
-		cModels.Directory, cModels.Menu, cModels.Button), mIds).Order("sort").Find(&subMenus).Error
-	if err != nil {
-		return err
-	}
-
-	subIds := make([]int, 0)
-	for _, menu := range subMenus {
-		if menu.ParentId != 0 {
-			subIds = append(subIds, menu.ParentId)
-		}
-		if menu.MenuType != cModels.Button {
-			*menus = append(*menus, menu)
-		}
-	}
-	return recursiveSetMenu(orm, subIds, menus)
 }
 
 // SetMenuRole 获取左侧菜单树使用
@@ -390,11 +305,7 @@ func (e *SysMenu) SetMenuRole(roleName string) (m []models.SysMenu, err error) {
 	return
 }
 
-func (e *SysMenu) getByRoleName(roleName string) ([]models.SysMenu, error) {
-	var role models.SysRole
-	var err error
-	data := make([]models.SysMenu, 0)
-
+func (e *SysMenu) getByRoleName(roleName string) (data []models.SysMenu, err error) {
 	if roleName == "admin" {
 		err = e.Orm.Where(" menu_type in ('M','C') and deleted_at is null").
 			Order("sort").
@@ -402,20 +313,8 @@ func (e *SysMenu) getByRoleName(roleName string) ([]models.SysMenu, error) {
 			Error
 		err = errors.WithStack(err)
 	} else {
-		role.RoleKey = roleName
-		err = e.Orm.Model(&role).Where("role_key = ? ", roleName).Preload("SysMenu").First(&role).Error
-
-		if role.SysMenu != nil {
-			mIds := make([]int, 0)
-			for _, menu := range *role.SysMenu {
-				mIds = append(mIds, menu.MenuId)
-			}
-			if err := recursiveSetMenu(e.Orm, mIds, &data); err != nil {
-				return nil, err
-			}
-
-			data = menuDistinct(data)
-		}
+		err = errors.WithStack(errors.Errorf("no such role(%v)", roleName))
+		return
 	}
 
 	sort.Sort(models.SysMenuSlice(data))

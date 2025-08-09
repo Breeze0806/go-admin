@@ -7,7 +7,6 @@ import (
 	"github.com/Breeze0806/go-admin-core/sdk"
 	toolsConfig "github.com/Breeze0806/go-admin-core/sdk/config"
 	"github.com/Breeze0806/go-admin-core/sdk/pkg"
-	mycasbin "github.com/Breeze0806/go-admin-core/sdk/pkg/casbin"
 	toolsDB "github.com/Breeze0806/go-admin-core/tools/database"
 	. "github.com/Breeze0806/go-admin-core/tools/gorm/logger"
 	"gorm.io/gorm"
@@ -58,8 +57,5 @@ func setupSimpleDatabase(host string, c *toolsConfig.Database) {
 		log.Info(pkg.Green(c.Driver + " connect success !"))
 	}
 
-	e := mycasbin.Setup(db, "")
-
 	sdk.Runtime.SetDb(host, db)
-	sdk.Runtime.SetCasbin(host, e)
 }

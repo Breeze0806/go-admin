@@ -1,11 +1,12 @@
 package apis
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
+	"go-admin/app/admin/models"
+
 	"github.com/Breeze0806/go-admin-core/sdk/api"
 	"github.com/Breeze0806/go-admin-core/sdk/pkg/jwtauth/user"
-	"go-admin/app/admin/models"
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 
 	"go-admin/app/admin/service"
 	"go-admin/app/admin/service/dto"
@@ -252,12 +253,10 @@ func (e SysMenu) GetMenuRole(c *gin.Context) {
 // @Security Bearer
 func (e SysMenu) GetMenuTreeSelect(c *gin.Context) {
 	m := service.SysMenu{}
-	r := service.SysRole{}
-	req :=dto.SelectRole{}
+	req := dto.SelectRole{}
 	err := e.MakeContext(c).
 		MakeOrm().
 		MakeService(&m.Service).
-		MakeService(&r.Service).
 		Bind(&req, nil).
 		Errors
 	if err != nil {
@@ -274,11 +273,7 @@ func (e SysMenu) GetMenuTreeSelect(c *gin.Context) {
 
 	menuIds := make([]int, 0)
 	if req.RoleId != 0 {
-		menuIds, err = r.GetRoleMenuId(req.RoleId)
-		if err != nil {
-			e.Error(500, err, "")
-			return
-		}
+		e.Error(500, err, "")
 	}
 	e.OK(gin.H{
 		"menus":       result,

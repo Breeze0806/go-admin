@@ -23,7 +23,7 @@ func (e *SysUser) GetPage(c *dto.SysUserGetPageReq, p *actions.DataPermission, l
 	var err error
 	var data models.SysUser
 
-	err = e.Orm.Debug().Preload("Dept").
+	err = e.Orm.Debug().
 		Scopes(
 			cDto.MakeCondition(c.GetNeedSearch()),
 			cDto.Paginate(c.GetPageSize(), c.GetPageIndex()),
@@ -248,16 +248,8 @@ func (e *SysUser) UpdatePwd(id int, oldPassword, newPassword string, p *actions.
 	return nil
 }
 
-func (e *SysUser) GetProfile(c *dto.SysUserById, user *models.SysUser, roles *[]models.SysRole, posts *[]models.SysPost) error {
+func (e *SysUser) GetProfile(c *dto.SysUserById, user *models.SysUser) error {
 	err := e.Orm.Preload("Dept").First(user, c.GetId()).Error
-	if err != nil {
-		return err
-	}
-	err = e.Orm.Find(roles, user.RoleId).Error
-	if err != nil {
-		return err
-	}
-	err = e.Orm.Find(posts, user.PostIds).Error
 	if err != nil {
 		return err
 	}

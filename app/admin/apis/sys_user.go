@@ -1,15 +1,16 @@
 package apis
 
 import (
-	"github.com/gin-gonic/gin/binding"
 	"go-admin/app/admin/models"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/Breeze0806/go-admin-core/sdk/api"
 	"github.com/Breeze0806/go-admin-core/sdk/pkg/jwtauth/user"
 	_ "github.com/Breeze0806/go-admin-core/sdk/pkg/response"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
 	"go-admin/app/admin/service"
@@ -384,18 +385,14 @@ func (e SysUser) GetProfile(c *gin.Context) {
 	req.Id = user.GetUserId(c)
 
 	sysUser := models.SysUser{}
-	roles := make([]models.SysRole, 0)
-	posts := make([]models.SysPost, 0)
-	err = s.GetProfile(&req, &sysUser, &roles, &posts)
+	err = s.GetProfile(&req, &sysUser)
 	if err != nil {
 		e.Logger.Errorf("get user profile error, %s", err.Error())
 		e.Error(500, err, "获取用户信息失败")
 		return
 	}
 	e.OK(gin.H{
-		"user":  sysUser,
-		"roles": roles,
-		"posts": posts,
+		"user": sysUser,
 	}, "查询成功")
 }
 
@@ -409,10 +406,8 @@ func (e SysUser) GetProfile(c *gin.Context) {
 func (e SysUser) GetInfo(c *gin.Context) {
 	req := dto.SysUserById{}
 	s := service.SysUser{}
-	r := service.SysRole{}
 	err := e.MakeContext(c).
 		MakeOrm().
-		MakeService(&r.Service).
 		MakeService(&s.Service).
 		Errors
 	if err != nil {
@@ -434,9 +429,9 @@ func (e SysUser) GetInfo(c *gin.Context) {
 		mp["permissions"] = permissions
 		mp["buttons"] = buttons
 	} else {
-		list, _ := r.GetById(user.GetRoleId(c))
-		mp["permissions"] = list
-		mp["buttons"] = list
+		e.Logger.Errorf("no such role(%v)", user.GetRoleName(c))
+		e.Error(500, err, err.Error())
+		return
 	}
 	sysUser := models.SysUser{}
 	req.Id = user.GetUserId(c)

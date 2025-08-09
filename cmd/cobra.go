@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"go-admin/cmd/api"
-	"go-admin/cmd/app"
 	"go-admin/cmd/version"
 	"go-admin/common/global"
 )
@@ -42,7 +41,6 @@ func tip() {
 func init() {
 	rootCmd.AddCommand(api.StartCmd)
 	rootCmd.AddCommand(version.StartCmd)
-	rootCmd.AddCommand(app.StartCmd)
 }
 
 // Execute : apply commands

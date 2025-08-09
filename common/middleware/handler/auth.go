@@ -5,7 +5,8 @@ import (
 	"go-admin/common"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"go-admin/common/global"
+
 	"github.com/Breeze0806/go-admin-core/sdk"
 	"github.com/Breeze0806/go-admin-core/sdk/api"
 	"github.com/Breeze0806/go-admin-core/sdk/config"
@@ -14,8 +15,8 @@ import (
 	jwt "github.com/Breeze0806/go-admin-core/sdk/pkg/jwtauth"
 	"github.com/Breeze0806/go-admin-core/sdk/pkg/jwtauth/user"
 	"github.com/Breeze0806/go-admin-core/sdk/pkg/response"
+	"github.com/gin-gonic/gin"
 	"github.com/mssola/user_agent"
-	"go-admin/common/global"
 )
 
 func PayloadFunc(data interface{}) jwt.MapClaims {
@@ -160,15 +161,10 @@ func LogOut(c *gin.Context) {
 }
 
 func Authorizator(data interface{}, c *gin.Context) bool {
-
 	if v, ok := data.(map[string]interface{}); ok {
 		u, _ := v["user"].(models.SysUser)
-		r, _ := v["role"].(models.SysRole)
-		c.Set("role", r.RoleName)
-		c.Set("roleIds", r.RoleId)
 		c.Set("userId", u.UserId)
 		c.Set("userName", u.Username)
-		c.Set("dataScope", r.DataScope)
 		return true
 	}
 	return false
